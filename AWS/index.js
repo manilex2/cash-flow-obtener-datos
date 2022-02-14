@@ -15,17 +15,17 @@ exports.handler = async function (event) {
         var sql = `SELECT name FROM ${process.env.TABLE_TICKERS_LIST}`;
         conexion.query(sql, function (err, resultado) {
             if (err) throw err;
-            guardarIncomeStatement(resultado);
+            guardarCashFlow(resultado);
         });
-        async function guardarIncomeStatement(resultado){
+        async function guardarCashFlow(resultado){
             for (let i = 0; i < resultado.length; i++) {
                 var ticker = resultado[i].name;
-                await fetch(`https://financialmodelingprep.com/api/v3/income-statement/${ticker}?apikey=${process.env.FMP_KEY}`)
+                await fetch(`https://financialmodelingprep.com/api/v3/cash-flow-statement/${ticker}?apikey=${process.env.FMP_KEY}`)
                 .then((res) => {
                     return res.json();
                 }).then((json) => {
-                    var incomeStatement = json;
-                    guardarBaseDeDatos(incomeStatement);
+                    var cashFlow = json;
+                    guardarBaseDeDatos(cashFlow);
                 }).catch((err) => {
                     console.error(err);
                 });
@@ -34,7 +34,7 @@ exports.handler = async function (event) {
         };
         function guardarBaseDeDatos(datos){
             for (let i = 0; i < datos.length; i++) {
-                var sql = `INSERT INTO ${process.env.TABLE_INCOME_STATEMENT} (
+                var sql = `INSERT INTO ${process.env.TABLE_CASH_FLOW} (
                     date,
                     symbol, 
                     cik,
@@ -43,34 +43,36 @@ exports.handler = async function (event) {
                     acceptedDate,
                     calendarYear,
                     period,
-                    revenue,
-                    costOfRevenue,
-                    grossProfit,
-                    grossProfitRatio,
-                    researchAndDevelopmentExpenses,
-                    generalAndAdministrativeExpenses,
-                    sellingAndMarketingExpenses,
-                    sellingGeneralAndAdministrativeExpenses,
-                    otherExpenses,
-                    operatingExpenses,
-                    costAndExpenses,
-                    interestIncome,
-                    interestExpense,
-                    depreciationAndAmortization,
-                    ebitda,
-                    ebitdaratio,
-                    operatingIncome,
-                    operatingIncomeRatio,
-                    totalOtherIncomeExpensesNet,
-                    incomeBeforeTax,
-                    incomeBeforeTaxRatio,
-                    incomeTaxExpense,
                     netIncome,
-                    netIncomeRatio,
-                    eps,
-                    epsdiluted,
-                    weightedAverageShsOut,
-                    weightedAverageShsOutDil,
+                    depreciationAndAmortization,
+                    deferredIncomeTax,
+                    stockBasedCompensation,
+                    changeInWorkingCapital,
+                    accountsReceivables,
+                    inventory,
+                    accountsPayables,
+                    otherWorkingCapital,
+                    otherNonCashItems,
+                    netCashProvidedByOperatingActivities,
+                    investmentsInPropertyPlantAndEquipment,
+                    acquisitionsNet,
+                    purchasesOfInvestments,
+                    salesMaturitiesOfInvestments,
+                    otherInvestingActivites,
+                    netCashUsedForInvestingActivites,
+                    debtRepayment,
+                    commonStockIssued,
+                    commonStockRepurchased,
+                    dividendsPaid,
+                    otherFinancingActivites,
+                    netCashUsedProvidedByFinancingActivities,
+                    effectOfForexChangesOnCash,
+                    netChangeInCash,
+                    cashAtEndOfPeriod,
+                    cashAtBeginningOfPeriod,
+                    operatingCashFlow,
+                    capitalExpenditure,
+                    freeCashFlow,
                     link,
                     finalLink
                     )
@@ -83,39 +85,41 @@ exports.handler = async function (event) {
                         '${datos[i].acceptedDate}' AS acceptedDate,
                         '${datos[i].calendarYear}' AS calendarYear,
                         '${datos[i].period}' AS period,
-                        ${datos[i].revenue} AS revenue,
-                        ${datos[i].costOfRevenue} AS costOfRevenue,
-                        ${datos[i].grossProfit} AS grossProfit,
-                        ${datos[i].grossProfitRatio} AS grossProfitRatio,
-                        ${datos[i].researchAndDevelopmentExpenses} AS researchAndDevelopmentExpenses,
-                        ${datos[i].generalAndAdministrativeExpenses} AS generalAndAdministrativeExpenses,
-                        ${datos[i].sellingAndMarketingExpenses} AS sellingAndMarketingExpenses,
-                        ${datos[i].sellingGeneralAndAdministrativeExpenses} AS sellingGeneralAndAdministrativeExpenses,
-                        ${datos[i].otherExpenses} AS otherExpenses,
-                        ${datos[i].operatingExpenses} AS operatingExpenses,
-                        ${datos[i].costAndExpenses} AS costAndExpenses,
-                        ${datos[i].interestIncome} AS interestIncome,
-                        ${datos[i].interestExpense} AS interestExpense,
-                        ${datos[i].depreciationAndAmortization} AS depreciationAndAmortization,
-                        ${datos[i].ebitda} AS ebitda,
-                        ${datos[i].ebitdaratio} AS ebitdaratio,
-                        ${datos[i].operatingIncome} AS operatingIncome,
-                        ${datos[i].operatingIncomeRatio} AS operatingIncomeRatio,
-                        ${datos[i].totalOtherIncomeExpensesNet} AS totalOtherIncomeExpensesNet,
-                        ${datos[i].incomeBeforeTax} AS incomeBeforeTax,
-                        ${datos[i].incomeBeforeTaxRatio} AS incomeBeforeTaxRatio,
-                        ${datos[i].incomeTaxExpense} AS incomeTaxExpense,
                         ${datos[i].netIncome} AS netIncome,
-                        ${datos[i].netIncomeRatio} AS netIncomeRatio,
-                        ${datos[i].eps} AS eps,
-                        ${datos[i].epsdiluted} AS epsdiluted,
-                        ${datos[i].weightedAverageShsOut} AS weightedAverageShsOut,
-                        ${datos[i].weightedAverageShsOutDil} AS weightedAverageShsOutDil,
+                        ${datos[i].depreciationAndAmortization} AS depreciationAndAmortization,
+                        ${datos[i].deferredIncomeTax} AS deferredIncomeTax,
+                        ${datos[i].stockBasedCompensation} AS stockBasedCompensation,
+                        ${datos[i].changeInWorkingCapital} AS changeInWorkingCapital,
+                        ${datos[i].accountsReceivables} AS accountsReceivables,
+                        ${datos[i].inventory} AS inventory,
+                        ${datos[i].accountsPayables} AS accountsPayables,
+                        ${datos[i].otherWorkingCapital} AS otherWorkingCapital,
+                        ${datos[i].otherNonCashItems} AS otherNonCashItems,
+                        ${datos[i].netCashProvidedByOperatingActivities} AS netCashProvidedByOperatingActivities,
+                        ${datos[i].investmentsInPropertyPlantAndEquipment} AS investmentsInPropertyPlantAndEquipment,
+                        ${datos[i].acquisitionsNet} AS acquisitionsNet,
+                        ${datos[i].purchasesOfInvestments} AS purchasesOfInvestments,
+                        ${datos[i].salesMaturitiesOfInvestments} AS salesMaturitiesOfInvestments,
+                        ${datos[i].otherInvestingActivites} AS otherInvestingActivites,
+                        ${datos[i].netCashUsedForInvestingActivites} AS netCashUsedForInvestingActivites,
+                        ${datos[i].debtRepayment} AS debtRepayment,
+                        ${datos[i].commonStockIssued} AS commonStockIssued,
+                        ${datos[i].commonStockRepurchased} AS commonStockRepurchased,
+                        ${datos[i].dividendsPaid} AS dividendsPaid,
+                        ${datos[i].otherFinancingActivites} AS otherFinancingActivites,
+                        ${datos[i].netCashUsedProvidedByFinancingActivities} AS netCashUsedProvidedByFinancingActivities,
+                        ${datos[i].effectOfForexChangesOnCash} AS effectOfForexChangesOnCash,
+                        ${datos[i].netChangeInCash} AS netChangeInCash,
+                        ${datos[i].cashAtEndOfPeriod} AS cashAtEndOfPeriod,
+                        ${datos[i].cashAtBeginningOfPeriod} AS cashAtBeginningOfPeriod,
+                        ${datos[i].operatingCashFlow} AS operatingCashFlow,
+                        ${datos[i].capitalExpenditure} AS capitalExpenditure,
+                        ${datos[i].freeCashFlow} AS freeCashFlow,
                         '${datos[i].link}' AS link,
                         '${datos[i].finalLink}' AS finalLink
                     ) AS tmp
                     WHERE NOT EXISTS (
-                        SELECT date, symbol FROM ${process.env.TABLE_INCOME_STATEMENT} WHERE date = '${datos[i].date}' AND symbol = '${datos[i].symbol}'
+                        SELECT date, symbol FROM ${process.env.TABLE_CASH_FLOW} WHERE date = '${datos[i].date}' AND symbol = '${datos[i].symbol}'
                     ) LIMIT 1`;
                 conexion.query(sql, function (err, resultado) {
                     if (err) throw err;
