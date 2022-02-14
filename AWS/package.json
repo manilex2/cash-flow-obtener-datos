@@ -1,0 +1,13 @@
+{
+  "name": "cash-flow-obtener-datos",
+  "version": "1.0.0",
+  "description": "Función que toma de la base de datos los tickers, obtiene el cash-flow y los pasa a la base de datos",
+  "main": "index.js",
+  "author": "Manuel Pereira",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "mysql2": "^2.3.3",
+    "node-fetch": "^2.6.7"
+  }
+}
