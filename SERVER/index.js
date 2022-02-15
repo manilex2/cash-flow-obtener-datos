@@ -6,17 +6,17 @@ const fetch = require('node-fetch');
 const { database } = require('./keys');
 const PUERTO = 4300;
 const app = express();
-const conexion = mysql.createConnection({
-    host: database.host,
-    user: database.user,
-    password: database.password,
-    port: database.port,
-    database: database.database
-});
 
 app.use(morgan('dev'));
 
 app.get('/', async (req, res) => {
+    const conexion = mysql.createConnection({
+        host: database.host,
+        user: database.user,
+        password: database.password,
+        port: database.port,
+        database: database.database
+    });
     var sql = `SELECT name FROM ${process.env.TABLE_TICKERS_LIST}`;
     conexion.query(sql, function (err, resultado) {
         if (err) throw err;
@@ -133,7 +133,7 @@ app.get('/', async (req, res) => {
         }
     };
     async function finalizarEjecucion() {
-        conexion.end()
+        conexion.end();
         res.send("Ejecutado");
     }
 });
